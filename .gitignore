@@ -1,0 +1,44 @@
+# =========================
+# Python Backend
+# =========================
+
+**/__pycache__/
+**/*.py[cod]
+
+# Virtual environments
+**/venv/
+**/.venv/
+
+# Jupyter
+**/.ipynb_checkpoints/
+
+# ML Model files
+**/*.pkl
+
+# Environment variables
+**/.env
+**/.env.*
+
+# =========================
+# Next.js Frontend
+# =========================
+
+**/node_modules/
+**/.next/
+**/out/
+**/.turbo/
+
+# =========================
+# IDE / OS
+# =========================
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
