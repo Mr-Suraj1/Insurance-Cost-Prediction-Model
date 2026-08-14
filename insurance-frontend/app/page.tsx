@@ -1,495 +1,708 @@
-"use client";
+const features = [
+  {
+    number: "01",
+    title: "Tell us about yourself",
+    description:
+      "Enter a few profile details such as age, BMI, smoking status, dependents and region.",
+  },
+  {
+    number: "02",
+    title: "AI analyzes your profile",
+    description:
+      "Our trained machine learning model processes your information and identifies relevant patterns.",
+  },
+  {
+    number: "03",
+    title: "Get your estimate",
+    description:
+      "Receive an estimated medical insurance charge in seconds through our prediction engine.",
+  },
+];
 
-import { useState } from "react";
+const profileFeatures = [
+  ["Age", "32 years"],
+  ["BMI", "27.4"],
+  ["Gender", "Male"],
+  ["Children", "1 dependent"],
+  ["Smoking", "Non-smoker"],
+  ["Region", "Southeast"],
+];
 
 export default function Home() {
-  const [age, setAge] = useState("");
-  const [gender, setGender] = useState("male");
-  const [bmi, setBmi] = useState("");
-  const [children, setChildren] = useState("");
-  const [smoker, setSmoker] = useState("no");
-  const [region, setRegion] = useState("southeast");
-
-  const [prediction, setPrediction] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handlePredict = async () => {
-    setError("");
-    setPrediction(null);
-
-    if (!age || !bmi || !children) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const response = await fetch("http://127.0.0.1:8000/predict", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          age: Number(age),
-          gender,
-          bmi: Number(bmi),
-          children: Number(children),
-          smoker,
-          region,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Prediction failed");
-      }
-
-      const data = await response.json();
-
-      setPrediction(data.predicted_charges);
-    } catch (err) {
-      setError(
-        "Unable to connect to the prediction server. Make sure FastAPI is running."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getBmiCategory = () => {
-    const value = Number(bmi);
-
-    if (!value) return "—";
-    if (value < 18.5) return "Underweight";
-    if (value < 25) return "Normal";
-    if (value < 30) return "Overweight";
-
-    return "Obese";
-  };
-
   return (
-    <main className="min-h-screen bg-[#070b14] text-white">
-
-      {/* Navbar */}
-      <nav className="border-b border-white/10 bg-[#070b14]/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500 font-bold">
-              IA
+    <main className="min-h-screen overflow-hidden bg-[#f7f5ef] text-[#111111]">
+      {/* ================= NAVBAR ================= */}
+      <nav className="sticky top-0 z-50 border-b border-black/10 bg-[#f7f5ef]/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6 lg:px-10">
+          {/* Logo */}
+          <a href="/" className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black text-white">
+              <span className="text-lg">✦</span>
             </div>
 
-            <span className="text-xl font-semibold tracking-tight">
-              Insure<span className="text-blue-400">AI</span>
+            <span className="text-xl font-semibold tracking-[-0.04em]">
+              InsureAI
             </span>
-          </div>
+          </a>
 
-          <div className="hidden gap-8 text-sm text-gray-400 md:flex">
-            <a href="#predict" className="transition hover:text-white">
-              Predict
-            </a>
-
-            <a href="#how" className="transition hover:text-white">
+          {/* Desktop Navigation */}
+          <div className="hidden items-center gap-8 text-sm text-black/60 md:flex">
+            <a
+              href="#how-it-works"
+              className="transition hover:text-black"
+            >
               How it works
             </a>
 
-            <a href="#about" className="transition hover:text-white">
+            <a href="#features" className="transition hover:text-black">
+              Features
+            </a>
+
+            <a href="#model" className="transition hover:text-black">
+              Model
+            </a>
+
+            <a href="#about" className="transition hover:text-black">
               About
             </a>
           </div>
 
-          <div className="rounded-full border border-white/10 px-4 py-2 text-xs text-gray-400">
-            ML Powered
-          </div>
-
+          {/* CTA */}
+          <a
+            href="/predict"
+            className="rounded-full bg-[#f4c453] px-5 py-3 text-sm font-semibold transition duration-300 hover:-translate-y-0.5 hover:bg-[#eab746]"
+          >
+            Predict Cost <span className="ml-1">↗</span>
+          </a>
         </div>
       </nav>
 
+      {/* ================= HERO ================= */}
+      <section className="relative">
+        {/* Decorative background */}
+        <div className="pointer-events-none absolute left-1/2 top-20 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-[#d7c1ff]/30 blur-3xl" />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-
-        {/* Background glow */}
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-blue-600/20 blur-[140px]" />
-
-        <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-20 text-center">
-
-          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-400/10 px-4 py-2 text-sm text-blue-300">
-            ✨ AI-powered insurance estimation
-          </div>
-
-          <h1 className="mx-auto max-w-4xl text-5xl font-bold leading-tight tracking-tight md:text-7xl">
-            Know your insurance cost
-            <span className="block text-blue-400">
-              before it surprises you.
-            </span>
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-400">
-            Get an instant estimate of your medical insurance charges
-            using a machine learning model trained on real insurance data.
-          </p>
-
-        </div>
-      </section>
-
-
-      {/* Predictor */}
-      <section id="predict" className="mx-auto max-w-7xl px-6 pb-24">
-
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-
-          {/* Form */}
-          <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 shadow-2xl backdrop-blur-xl">
-
-            <div className="mb-8">
-              <p className="text-sm font-medium text-blue-400">
-                YOUR PROFILE
-              </p>
-
-              <h2 className="mt-2 text-2xl font-semibold">
-                Tell us about yourself
-              </h2>
-
-              <p className="mt-2 text-sm text-gray-500">
-                Enter your information to calculate an estimated insurance
-                cost.
-              </p>
+        <div className="relative mx-auto grid min-h-[720px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.05fr_.95fr] lg:px-10">
+          {/* Hero copy */}
+          <div>
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-black/60">
+              <span className="h-2 w-2 rounded-full bg-[#f4c453]" />
+              AI-POWERED INSURANCE ESTIMATION
             </div>
 
+            <h1 className="max-w-4xl text-[clamp(3.5rem,7vw,6.8rem)] font-medium leading-[0.92] tracking-[-0.075em]">
+              A smarter way to estimate your{" "}
+              <span className="relative inline-block">
+                insurance cost.
+                <span className="absolute -bottom-2 left-1 h-3 w-[92%] rounded-full bg-[#f4c453]/70" />
+              </span>
+            </h1>
 
-            <div className="grid gap-6 sm:grid-cols-2">
+            <p className="mt-8 max-w-xl text-lg leading-8 text-black/55">
+              InsureAI uses machine learning to estimate medical insurance
+              charges from your personal profile — simply, quickly and
+              transparently.
+            </p>
 
-              {/* Age */}
-              <div>
-                <label className="mb-2 block text-sm text-gray-300">
-                  Age
-                </label>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <a
+                href="/predict"
+                className="rounded-full bg-black px-7 py-4 text-sm font-semibold text-white transition duration-300 hover:-translate-y-1 hover:bg-black/85"
+              >
+                Predict My Cost <span className="ml-2">→</span>
+              </a>
 
-                <input
-                  type="number"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="e.g. 32"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-blue-400"
-                />
-              </div>
-
-
-              {/* Gender */}
-              <div>
-                <label className="mb-2 block text-sm text-gray-300">
-                  Gender
-                </label>
-
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-blue-400"
-                >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-
-
-              {/* BMI */}
-              <div>
-                <label className="mb-2 block text-sm text-gray-300">
-                  BMI
-                </label>
-
-                <input
-                  type="number"
-                  step="0.1"
-                  value={bmi}
-                  onChange={(e) => setBmi(e.target.value)}
-                  placeholder="e.g. 27.4"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-blue-400"
-                />
-
-                <p className="mt-2 text-xs text-gray-500">
-                  Category: {getBmiCategory()}
-                </p>
-              </div>
-
-
-              {/* Children */}
-              <div>
-                <label className="mb-2 block text-sm text-gray-300">
-                  Children
-                </label>
-
-                <input
-                  type="number"
-                  min="0"
-                  value={children}
-                  onChange={(e) => setChildren(e.target.value)}
-                  placeholder="e.g. 1"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-blue-400"
-                />
-              </div>
-
-
-              {/* Smoker */}
-              <div>
-                <label className="mb-2 block text-sm text-gray-300">
-                  Smoking status
-                </label>
-
-                <select
-                  value={smoker}
-                  onChange={(e) => setSmoker(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-blue-400"
-                >
-                  <option value="no">Non-smoker</option>
-                  <option value="yes">Smoker</option>
-                </select>
-              </div>
-
-
-              {/* Region */}
-              <div>
-                <label className="mb-2 block text-sm text-gray-300">
-                  Region
-                </label>
-
-                <select
-                  value={region}
-                  onChange={(e) => setRegion(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-blue-400"
-                >
-                  <option value="northeast">Northeast</option>
-                  <option value="northwest">Northwest</option>
-                  <option value="southeast">Southeast</option>
-                  <option value="southwest">Southwest</option>
-                </select>
-              </div>
-
+              <a
+                href="#how-it-works"
+                className="rounded-full border border-black/15 bg-white px-7 py-4 text-sm font-semibold transition duration-300 hover:-translate-y-1 hover:border-black/30"
+              >
+                How it works
+              </a>
             </div>
 
-
-            {error && (
-              <div className="mt-6 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300">
-                {error}
-              </div>
-            )}
-
-
-            <button
-              onClick={handlePredict}
-              disabled={loading}
-              className="mt-8 w-full rounded-xl bg-blue-500 px-6 py-4 font-semibold text-white transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? "Calculating..." : "✨ Predict Insurance Cost"}
-            </button>
-
+            <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 text-sm text-black/45">
+              <span>✓ Machine learning powered</span>
+              <span>✓ Instant estimation</span>
+              <span>✓ Profile based</span>
+            </div>
           </div>
 
-
-          {/* Result */}
-          <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-blue-500/10 to-purple-500/10 p-8">
-
-            <div className="flex h-full flex-col">
-
-              <p className="text-sm font-medium text-blue-400">
-                PREDICTION
+          {/* ================= PREDICTION VISUAL ================= */}
+          <div className="relative mx-auto w-full max-w-[540px]">
+            {/* Floating card */}
+            <div className="absolute -right-3 -top-8 z-20 rounded-2xl border border-black/10 bg-white px-5 py-4 shadow-xl shadow-black/5">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-black/40">
+                MODEL STATUS
               </p>
 
-              <h2 className="mt-2 text-2xl font-semibold">
-                Estimated insurance cost
-              </h2>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                <span className="text-sm font-semibold">
+                  Ready to predict
+                </span>
+              </div>
+            </div>
 
+            {/* Main dashboard */}
+            <div className="rounded-[32px] bg-[#0b0b0c] p-3 shadow-2xl shadow-black/20">
+              <div className="rounded-[25px] bg-[#151518] p-7 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs tracking-[0.18em] text-white/40">
+                      INSUREAI
+                    </p>
 
-              {prediction === null ? (
-
-                <div className="flex flex-1 flex-col items-center justify-center py-20 text-center">
-
-                  <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-3xl">
-                    ✨
+                    <p className="mt-2 text-sm text-white/60">
+                      AI cost estimation
+                    </p>
                   </div>
 
-                  <p className="text-lg font-medium text-gray-300">
-                    Your prediction will appear here
-                  </p>
-
-                  <p className="mt-2 max-w-sm text-sm leading-6 text-gray-500">
-                    Fill out your profile and click the prediction button to
-                    get your estimated insurance charges.
-                  </p>
-
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f4c453] text-black">
+                    ✦
+                  </div>
                 </div>
 
-              ) : (
-
-                <div className="flex flex-1 flex-col justify-center">
-
-                  <p className="text-sm text-gray-500">
+                <div className="mt-10">
+                  <p className="text-sm text-white/40">
                     Estimated charges
                   </p>
 
-                  <div className="mt-3 text-6xl font-bold tracking-tight text-white">
-                    ${prediction.toLocaleString()}
+                  <div className="mt-2 text-5xl font-medium tracking-[-0.06em] sm:text-6xl">
+                    $4,722
+                    <span className="text-white/40">.12</span>
                   </div>
 
-                  <p className="mt-2 text-sm text-gray-500">
-                    Estimated medical insurance charges
-                  </p>
+                  <div className="mt-4 flex items-center gap-2 text-sm">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
 
-
-                  <div className="mt-10 grid gap-3 sm:grid-cols-2">
-
-                    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs text-gray-500">
-                        BMI
-                      </p>
-
-                      <p className="mt-1 font-medium">
-                        {bmi}
-                      </p>
-
-                      <p className="mt-1 text-xs text-blue-400">
-                        {getBmiCategory()}
-                      </p>
-                    </div>
-
-
-                    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs text-gray-500">
-                        Smoking
-                      </p>
-
-                      <p className="mt-1 font-medium">
-                        {smoker === "yes" ? "Smoker" : "Non-smoker"}
-                      </p>
-                    </div>
-
-
-                    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs text-gray-500">
-                        Age
-                      </p>
-
-                      <p className="mt-1 font-medium">
-                        {age} years
-                      </p>
-                    </div>
-
-
-                    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs text-gray-500">
-                        Region
-                      </p>
-
-                      <p className="mt-1 font-medium capitalize">
-                        {region}
-                      </p>
-                    </div>
-
+                    <span className="text-white/60">
+                      Estimated from your profile
+                    </span>
                   </div>
-
                 </div>
 
-              )}
+                {/* Mini chart */}
+                <div className="mt-10 flex h-24 items-end gap-2">
+                  {[28, 42, 35, 56, 48, 72, 63, 82, 70, 91, 76, 95].map(
+                    (height, index) => (
+                      <div
+                        key={index}
+                        className="flex-1 rounded-t-md bg-[#f4c453]/80"
+                        style={{ height: `${height}%` }}
+                      />
+                    ),
+                  )}
+                </div>
 
+                {/* Profile */}
+                <div className="mt-8 grid grid-cols-2 gap-3">
+                  {[
+                    ["Age", "32"],
+                    ["BMI", "27.4"],
+                    ["Smoking", "No"],
+                    ["Region", "Southeast"],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"
+                    >
+                      <p className="text-xs text-white/35">{label}</p>
+
+                      <p className="mt-2 text-sm font-medium">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-          </div>
+            {/* Small floating AI badge */}
+            <div className="absolute -bottom-8 -left-7 rounded-2xl bg-[#c9a4ff] px-5 py-4 shadow-xl">
+              <p className="text-xs font-semibold text-black/50">
+                POWERED BY
+              </p>
 
+              <p className="mt-1 text-sm font-semibold">
+                Random Forest ML
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
+      {/* ================= STATS ================= */}
+      <section className="border-y border-black/10 bg-white">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-black/10 lg:grid-cols-4">
+          {[
+            ["6", "Profile inputs"],
+            ["ML", "Prediction engine"],
+            ["Fast", "API inference"],
+            ["1-click", "Cost estimation"],
+          ].map(([value, label]) => (
+            <div key={label} className="px-6 py-10 lg:px-10">
+              <p className="text-3xl font-medium tracking-[-0.05em]">
+                {value}
+              </p>
 
-      {/* How it works */}
+              <p className="mt-2 text-sm text-black/45">
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ================= HOW IT WORKS ================= */}
       <section
-        id="how"
-        className="border-t border-white/10 bg-white/[0.02]"
+        id="how-it-works"
+        className="mx-auto max-w-7xl px-6 py-28 lg:px-10"
       >
-
-        <div className="mx-auto max-w-7xl px-6 py-20">
-
-          <div className="text-center">
-
-            <p className="text-sm font-medium text-blue-400">
+        <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr]">
+          <div>
+            <p className="text-sm font-semibold tracking-[0.15em] text-black/40">
               HOW IT WORKS
             </p>
 
-            <h2 className="mt-2 text-3xl font-bold">
-              From your profile to a prediction
+            <h2 className="mt-5 text-5xl font-medium leading-[0.98] tracking-[-0.06em] lg:text-6xl">
+              From your profile to an estimate in seconds.
             </h2>
-
           </div>
 
+          <div className="grid gap-4">
+            {features.map((feature) => (
+              <div
+                key={feature.number}
+                className="group rounded-[28px] border border-black/10 bg-white p-7 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5"
+              >
+                <div className="flex gap-6">
+                  <span className="text-sm font-semibold text-black/30">
+                    {feature.number}
+                  </span>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+                  <div>
+                    <h3 className="text-2xl font-medium tracking-[-0.04em]">
+                      {feature.title}
+                    </h3>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-              <div className="text-3xl">01</div>
+                    <p className="mt-3 max-w-xl leading-7 text-black/50">
+                      {feature.description}
+                    </p>
+                  </div>
 
-              <h3 className="mt-5 text-lg font-semibold">
-                Enter your details
-              </h3>
-
-              <p className="mt-2 text-sm leading-6 text-gray-500">
-                Provide basic information such as age, BMI, smoking status,
-                children and region.
-              </p>
-            </div>
-
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-              <div className="text-3xl">02</div>
-
-              <h3 className="mt-5 text-lg font-semibold">
-                ML model analyzes
-              </h3>
-
-              <p className="mt-2 text-sm leading-6 text-gray-500">
-                Our Random Forest model processes your information and
-                identifies important patterns.
-              </p>
-            </div>
-
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-              <div className="text-3xl">03</div>
-
-              <h3 className="mt-5 text-lg font-semibold">
-                Get your estimate
-              </h3>
-
-              <p className="mt-2 text-sm leading-6 text-gray-500">
-                Receive an instant estimated insurance charge based on the
-                model prediction.
-              </p>
-            </div>
-
+                  <div className="ml-auto hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black text-white transition group-hover:rotate-45 sm:flex">
+                    ↗
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-
         </div>
-
       </section>
 
-
-      {/* Footer */}
-      <footer
-        id="about"
-        className="border-t border-white/10 px-6 py-8"
+      {/* ================= PROFILE ================= */}
+      <section
+        id="features"
+        className="bg-black px-6 py-28 text-white lg:px-10"
       >
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 text-sm text-gray-500 md:flex-row">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]">
+            <div>
+              <p className="text-sm font-semibold tracking-[0.15em] text-white/40">
+                YOUR PROFILE
+              </p>
 
-          <p>
-            © 2026 InsureAI. Machine Learning Insurance Predictor.
-          </p>
+              <h2 className="mt-5 text-5xl font-medium leading-[0.98] tracking-[-0.06em] lg:text-6xl">
+                Simple inputs.
+                <br />
+                Meaningful prediction.
+              </h2>
 
-          <p>
-            Built with Next.js + FastAPI + Random Forest
-          </p>
+              <p className="mt-7 max-w-md leading-7 text-white/45">
+                InsureAI considers several profile attributes to generate an
+                estimated medical insurance charge.
+              </p>
+            </div>
 
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {profileFeatures.map(([label, value], index) => (
+                <div
+                  key={label}
+                  className={`min-h-[180px] rounded-[26px] p-6 ${
+                    index === 1
+                      ? "bg-[#f4c453] text-black"
+                      : index === 4
+                        ? "bg-[#c9a4ff] text-black"
+                        : "bg-white/[0.07] text-white"
+                  }`}
+                >
+                  <p className="text-xs font-semibold tracking-[0.14em] opacity-50">
+                    {label.toUpperCase()}
+                  </p>
+
+                  <p className="mt-12 text-xl font-medium tracking-[-0.03em]">
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </footer>
+      </section>
 
+      {/* ================= MODEL ================= */}
+      <section
+        id="model"
+        className="bg-[#f7f5ef] px-6 py-28 lg:px-10"
+      >
+        <div className="mx-auto max-w-7xl">
+          <div className="rounded-[36px] bg-[#e8e0d1] p-8 sm:p-12 lg:p-16">
+            <div className="grid items-center gap-14 lg:grid-cols-2">
+              <div>
+                <p className="text-sm font-semibold tracking-[0.15em] text-black/40">
+                  THE PREDICTION ENGINE
+                </p>
+
+                <h2 className="mt-5 text-5xl font-medium leading-[0.98] tracking-[-0.06em] lg:text-6xl">
+                  Machine learning behind a simple experience.
+                </h2>
+
+                <p className="mt-7 max-w-lg leading-7 text-black/55">
+                  A trained Random Forest regression model powers the
+                  prediction while FastAPI handles real-time inference between
+                  the model and the frontend.
+                </p>
+
+                <a
+                  href="/predict"
+                  className="mt-8 inline-flex rounded-full bg-black px-6 py-4 text-sm font-semibold text-white transition hover:-translate-y-1"
+                >
+                  Try the model →
+                </a>
+              </div>
+
+              <div className="rounded-[28px] bg-[#0b0b0c] p-7 text-white">
+                <div className="space-y-3">
+                  {[
+                    ["01", "User profile"],
+                    ["02", "Feature processing"],
+                    ["03", "Random Forest model"],
+                    ["04", "FastAPI inference"],
+                    ["05", "Estimated charges"],
+                  ].map(([number, title], index) => (
+                    <div key={number}>
+                      <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                        <span className="text-xs text-white/30">
+                          {number}
+                        </span>
+
+                        <span className="text-sm font-medium">
+                          {title}
+                        </span>
+
+                        {index < 4 && (
+                          <span className="ml-auto text-white/25">
+                            ↓
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= WHY ================= */}
+      <section
+        id="about"
+        className="px-6 py-28 lg:px-10"
+      >
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-12 lg:grid-cols-[.7fr_1.3fr]">
+            <div>
+              <p className="text-sm font-semibold tracking-[0.15em] text-black/40">
+                WHY INSUREAI
+              </p>
+
+              <h2 className="mt-5 text-5xl font-medium leading-[0.98] tracking-[-0.06em] lg:text-6xl">
+                Insurance estimation, without the complexity.
+              </h2>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-[26px] bg-[#f4c453] p-7">
+                <div className="text-3xl">⚡</div>
+
+                <h3 className="mt-16 text-xl font-medium">
+                  Instant
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-black/55">
+                  Get a prediction without manually calculating your profile.
+                </p>
+              </div>
+
+              <div className="rounded-[26px] bg-[#c9a4ff] p-7">
+                <div className="text-3xl">✦</div>
+
+                <h3 className="mt-16 text-xl font-medium">
+                  AI powered
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-black/55">
+                  Predictions are generated using a trained ML model.
+                </p>
+              </div>
+
+              <div className="rounded-[26px] bg-black p-7 text-white">
+                <div className="text-3xl">◌</div>
+
+                <h3 className="mt-16 text-xl font-medium">
+                  Transparent
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-white/45">
+                  Understand the profile factors used for your estimate.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= CTA ================= */}
+      <section className="px-6 pb-8 lg:px-10">
+        <div className="mx-auto max-w-7xl overflow-hidden rounded-[36px] bg-black px-7 py-20 text-center text-white sm:px-12">
+          <p className="text-sm font-semibold tracking-[0.15em] text-white/40">
+            READY TO ESTIMATE?
+          </p>
+
+          <h2 className="mx-auto mt-5 max-w-3xl text-5xl font-medium leading-[0.95] tracking-[-0.065em] sm:text-6xl lg:text-7xl">
+            Curious what your insurance cost could look like?
+          </h2>
+
+          <p className="mx-auto mt-7 max-w-xl leading-7 text-white/45">
+            Enter your profile and get an AI-powered estimate in seconds.
+          </p>
+
+          <a
+            href="/predict"
+            className="mt-9 inline-flex rounded-full bg-[#f4c453] px-7 py-4 text-sm font-semibold text-black transition duration-300 hover:-translate-y-1 hover:bg-[#ffd66d]"
+          >
+            Predict My Cost →
+          </a>
+        </div>
+      </section>
+
+      {/* ================= DISCLAIMER ================= */}
+      <section className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 text-sm leading-6 text-black/45">
+          <strong className="text-black/70">
+            Disclaimer:
+          </strong>{" "}
+          InsureAI provides machine-learning-based estimates for educational
+          and informational purposes only. Predictions are not official
+          insurance quotes and should not be considered financial, medical, or
+          insurance advice.
+        </div>
+      </section>
+
+      {/* ================= FOOTER ================= */}
+<footer className="bg-black text-white">
+  <div className="mx-auto max-w-7xl px-6 pt-20 sm:pt-24 lg:px-10">
+    {/* Footer Content */}
+    <div className="grid gap-16 lg:grid-cols-[1.2fr_2fr]">
+      
+      {/* Brand */}
+      <div>
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-black">
+            ✦
+          </div>
+
+          <span className="text-2xl font-bold tracking-tight">
+            InsureAI
+          </span>
+        </div>
+
+        <p className="mt-7 max-w-md text-base leading-7 text-white/50 sm:text-lg sm:leading-8">
+          AI-powered insurance cost estimation built to make medical
+          insurance predictions simpler, faster, and more transparent.
+        </p>
+
+        {/* Social Links */}
+        <div className="mt-8 flex gap-3">
+          <a
+            href="https://github.com/Mr-Suraj1/Insurance-Cost-Prediction-Model"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-xs font-medium transition hover:border-white hover:bg-white hover:text-black"
+          >
+            GH
+          </a>
+
+          <a
+            href="#"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-sm transition hover:border-white hover:bg-white hover:text-black"
+          >
+            in
+          </a>
+
+          <a
+            href="#"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-sm transition hover:border-white hover:bg-white hover:text-black"
+          >
+            X
+          </a>
+        </div>
+      </div>
+
+      {/* Footer Links */}
+      <div className="grid grid-cols-2 gap-12 sm:grid-cols-3">
+        
+        {/* Product */}
+        <div>
+          <p className="mb-7 text-xs font-semibold uppercase tracking-[0.2em] text-white/35">
+            Product
+          </p>
+
+          <div className="space-y-5 text-sm text-white/60">
+            <a
+              href="/predict"
+              className="block transition hover:text-white"
+            >
+              Predict Cost
+            </a>
+
+            <a
+              href="#how-it-works"
+              className="block transition hover:text-white"
+            >
+              How It Works
+            </a>
+
+            <a
+              href="#features"
+              className="block transition hover:text-white"
+            >
+              Features
+            </a>
+
+            <a
+              href="#model"
+              className="block transition hover:text-white"
+            >
+              Model
+            </a>
+          </div>
+        </div>
+
+        {/* Project */}
+        <div>
+          <p className="mb-7 text-xs font-semibold uppercase tracking-[0.2em] text-white/35">
+            Project
+          </p>
+
+          <div className="space-y-5 text-sm text-white/60">
+            <a
+              href="#about"
+              className="block transition hover:text-white"
+            >
+              About InsureAI
+            </a>
+
+            <a
+              href="#model"
+              className="block transition hover:text-white"
+            >
+              Technology
+            </a>
+
+            <a
+              href="https://github.com/Mr-Suraj1/Insurance-Cost-Prediction-Model"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block transition hover:text-white"
+            >
+              GitHub
+            </a>
+
+            <a
+              href="https://github.com/Mr-Suraj1/Insurance-Cost-Prediction-Model"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block transition hover:text-white"
+            >
+              Documentation
+            </a>
+          </div>
+        </div>
+
+        {/* Connect */}
+        <div>
+          <p className="mb-7 text-xs font-semibold uppercase tracking-[0.2em] text-white/35">
+            Connect
+          </p>
+
+          <div className="space-y-5 text-sm text-white/60">
+            <a
+              href="https://github.com/Mr-Suraj1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block transition hover:text-white"
+            >
+              Developer
+            </a>
+
+            <a
+              href="https://github.com/Mr-Suraj1/Insurance-Cost-Prediction-Model"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block transition hover:text-white"
+            >
+              Source Code
+            </a>
+
+            <a
+              href="https://github.com/Mr-Suraj1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block transition hover:text-white"
+            >
+              Contact
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Divider */}
+    <div className="mt-20 border-t border-white/10" />
+
+    {/* Giant Brand Text */}
+    <div className="relative mt-12 overflow-hidden">
+      <div className="select-none whitespace-nowrap text-center text-[clamp(5rem,15vw,14rem)] font-black leading-[0.75] tracking-[-0.09em] text-white/[0.045]">
+        InsureAI
+      </div>
+    </div>
+
+    {/* Bottom Bar */}
+    <div className="flex flex-col gap-4 border-t border-white/10 py-7 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
+      <p>
+        © 2026 InsureAI. All rights reserved.
+      </p>
+
+      <div className="flex flex-wrap gap-4">
+        <span>Next.js</span>
+        <span>•</span>
+        <span>FastAPI</span>
+        <span>•</span>
+        <span>Machine Learning</span>
+      </div>
+    </div>
+  </div>
+</footer>
     </main>
   );
 }
