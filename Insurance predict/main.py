@@ -1,8 +1,41 @@
+import os
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Literal
 import pandas as pd
 import joblib
+
+
+# Load environment configuration
+def get_cors_origins() -> list[str]:
+    """Load CORS origins from environment variable or use defaults."""
+    cors_env = os.getenv("API_CORS_ORIGINS")
+    if cors_env:
+        return [origin.strip() for origin in cors_env.split(",")]
+    return [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+    ]
+
+
+def get_model_path() -> str:
+    """Get model path from environment or relative to this script."""
+    model_env = os.getenv("MODEL_PATH")
+    if model_env:
+        return model_env
+    # Default: look in same directory as this script
+    return str(Path(__file__).parent / "insurance_model.pkl")
+
+
+def get_features_path() -> str:
+    """Get features path from environment or relative to this script."""
+    features_env = os.getenv("FEATURES_PATH")
+    if features_env:
+        return features_env
+    # Default: look in same directory as this script
+    return str(Path(__file__).parent / "feature_columns.pkl")
 
 
 app = FastAPI(
@@ -12,30 +45,44 @@ app = FastAPI(
 )
 
 
+# Configure CORS
+cors_origins = get_cors_origins()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000"
-    ],
+    allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
 
-
-model = joblib.load("insurance_model.pkl")
-feature_columns = joblib.load("feature_columns.pkl")
+# Load model and features with error handling
+try:
+    model_path = get_model_path()
+    if not Path(model_path).exists():
+        raise FileNotFoundError(f"Model file not found at: {model_path}")
+    model = joblib.load(model_path)
+    
+    features_path = get_features_path()
+    if not Path(features_path).exists():
+        raise FileNotFoundError(f"Features file not found at: {features_path}")
+    feature_columns = joblib.load(features_path)
+    
+    print(f"[OK] Model loaded from: {model_path}")
+    print(f"[OK] Features loaded from: {features_path}")
+    print(f"[OK] CORS origins: {cors_origins}")
+except FileNotFoundError as e:
+    print(f"[ERROR] Startup Error: {e}")
+    raise
 
 
 class InsuranceInput(BaseModel):
-    age: int
-    gender: str
-    bmi: float
-    children: int
-    smoker: str
-    region: str
+    age: int = Field(..., ge=18, le=120, description="Age in years (18-120)")
+    gender: Literal["male", "female"] = Field(..., description="Gender: male or female")
+    bmi: float = Field(..., ge=10, le=80, description="Body Mass Index (10-80)")
+    children: int = Field(..., ge=0, le=20, description="Number of children (0-20)")
+    smoker: Literal["yes", "no"] = Field(..., description="Smoking status: yes or no")
+    region: Literal["northeast", "northwest", "southeast", "southwest"] = Field(..., description="Geographic region")
 
 
 @app.get("/")

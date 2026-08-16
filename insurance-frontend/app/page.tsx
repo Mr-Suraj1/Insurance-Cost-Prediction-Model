@@ -1,34 +1,5 @@
+import Link from "next/link";
 import PredictionForm from './components/PredictionForm';
-
-const features = [
-  {
-    number: "01",
-    title: "Tell us about yourself",
-    description:
-      "Enter a few profile details such as age, BMI, smoking status, dependents and region.",
-  },
-  {
-    number: "02",
-    title: "AI analyzes your profile",
-    description:
-      "Our trained machine learning model processes your information and identifies relevant patterns.",
-  },
-  {
-    number: "03",
-    title: "Get your estimate",
-    description:
-      "Receive an estimated medical insurance charge in seconds through our prediction engine.",
-  },
-];
-
-const profileFeatures = [
-  ["Age", "32 years"],
-  ["BMI", "27.4"],
-  ["Gender", "Male"],
-  ["Children", "1 dependent"],
-  ["Smoking", "Non-smoker"],
-  ["Region", "Southeast"],
-];
 
 export default function Home() {
   return (
@@ -37,7 +8,7 @@ export default function Home() {
       <nav className="sticky top-0 z-50 border-b border-black/10 bg-[#f7f5ef]/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6 lg:px-10">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black text-white">
               <span className="text-lg">✦</span>
             </div>
@@ -45,7 +16,7 @@ export default function Home() {
             <span className="text-xl font-semibold tracking-[-0.04em]">
               InsureAI
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-8 text-sm text-black/60 md:flex">
@@ -1079,7 +1050,7 @@ export default function Home() {
                 <p className="text-sm font-semibold tracking-[0.15em] text-white/60">READY WHEN YOU ARE</p>
 
                 <h2 className="mt-4 text-4xl font-medium leading-[1.02] lg:text-5xl">
-                  Insurance costs don't have to be a guess.
+                  Insurance costs don&apos;t have to be a guess.
                 </h2>
 
                 <p className="mt-4 max-w-xl text-sm text-white/70">

@@ -30,7 +30,12 @@ export default function PredictionForm() {
         region,
       };
 
-      const res = await fetch("http://127.0.0.1:8000/predict", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) {
+        throw new Error("API URL not configured");
+      }
+
+      const res = await fetch(`${apiUrl}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -50,7 +55,7 @@ export default function PredictionForm() {
       } else {
         throw new Error("Unexpected response from server");
       }
-    } catch (err: any) {
+    } catch (err) {
       setError("We couldn't generate an estimate right now. Please try again.");
       console.error(err);
     } finally {
