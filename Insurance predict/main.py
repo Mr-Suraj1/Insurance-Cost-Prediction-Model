@@ -92,6 +92,14 @@ def home():
     }
 
 
+@app.get("/health")
+def health():
+    return {
+        "status": "ok",
+        "model_loaded": model is not None
+    }
+
+
 @app.post("/predict")
 def predict(data: InsuranceInput):
 
