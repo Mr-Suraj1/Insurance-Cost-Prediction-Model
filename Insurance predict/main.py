@@ -102,92 +102,96 @@ def health():
 
 @app.post("/predict")
 def predict(data: InsuranceInput):
+    try:
 
 
 
-    is_female = (
-        1 if data.gender.lower() == "female" else 0
-    )
+        is_female = (
+            1 if data.gender.lower() == "female" else 0
+        )
 
 
-    is_smoker = (
-        1 if data.smoker.lower() == "yes" else 0
-    )
+        is_smoker = (
+            1 if data.smoker.lower() == "yes" else 0
+        )
 
 
-    # -------------------------------------------------
-    # Region Encoding
-    # -------------------------------------------------
+        # -------------------------------------------------
+        # Region Encoding
+        # -------------------------------------------------
 
-    region_northwest = (
-        1 if data.region.lower() == "northwest" else 0
-    )
+        region_northwest = (
+            1 if data.region.lower() == "northwest" else 0
+        )
 
-    region_southeast = (
-        1 if data.region.lower() == "southeast" else 0
-    )
+        region_southeast = (
+            1 if data.region.lower() == "southeast" else 0
+        )
 
-    region_southwest = (
-        1 if data.region.lower() == "southwest" else 0
-    )
-
-
-    # -------------------------------------------------
-    # BMI Category
-    # -------------------------------------------------
-
-    bmi_category_normal = (
-        1 if 18.5 <= data.bmi < 25 else 0
-    )
-
-    bmi_category_overweight = (
-        1 if 25 <= data.bmi < 30 else 0
-    )
-
-    bmi_category_obese = (
-        1 if data.bmi >= 30 else 0
-    )
+        region_southwest = (
+            1 if data.region.lower() == "southwest" else 0
+        )
 
 
-    # -------------------------------------------------
-    # Create Input DataFrame
-    # -------------------------------------------------
+        # -------------------------------------------------
+        # BMI Category
+        # -------------------------------------------------
 
-    input_data = pd.DataFrame([{
-        "age": data.age,
-        "bmi": data.bmi,
-        "children": data.children,
-        "is_female": is_female,
-        "is_smoker": is_smoker,
+        bmi_category_normal = (
+            1 if 18.5 <= data.bmi < 25 else 0
+        )
 
-        "region_northwest": region_northwest,
-        "region_southeast": region_southeast,
-        "region_southwest": region_southwest,
+        bmi_category_overweight = (
+            1 if 25 <= data.bmi < 30 else 0
+        )
 
-        "bmi_category_Normal": bmi_category_normal,
-        "bmi_category_Overweight": bmi_category_overweight,
-        "bmi_category_Obese": bmi_category_obese
-    }])
+        bmi_category_obese = (
+            1 if data.bmi >= 30 else 0
+        )
 
 
-    # -------------------------------------------------
-    # Keep Same Feature Order Used During Training
-    # -------------------------------------------------
+        # -------------------------------------------------
+        # Create Input DataFrame
+        # -------------------------------------------------
 
-    input_data = input_data[feature_columns]
+        input_data = pd.DataFrame([{
+            "age": data.age,
+            "bmi": data.bmi,
+            "children": data.children,
+            "is_female": is_female,
+            "is_smoker": is_smoker,
+
+            "region_northwest": region_northwest,
+            "region_southeast": region_southeast,
+            "region_southwest": region_southwest,
+
+            "bmi_category_Normal": bmi_category_normal,
+            "bmi_category_Overweight": bmi_category_overweight,
+            "bmi_category_Obese": bmi_category_obese
+        }])
 
 
-    # -------------------------------------------------
-    # Make Prediction
-    # -------------------------------------------------
+        # -------------------------------------------------
+        # Keep Same Feature Order Used During Training
+        # -------------------------------------------------
 
-    prediction = model.predict(input_data)[0]
+        input_data = input_data[feature_columns]
 
 
-    # -------------------------------------------------
-    # Return Result
-    # -------------------------------------------------
+        # -------------------------------------------------
+        # Make Prediction
+        # -------------------------------------------------
 
-    return {
-        "predicted_charges": round(float(prediction), 2)
-    }
+        prediction = model.predict(input_data)[0]
+
+
+        # -------------------------------------------------
+        # Return Result
+        # -------------------------------------------------
+
+        return {
+            "predicted_charges": round(float(prediction), 2)
+        }
+    except Exception:
+        logger.exception("Prediction failed due to internal error")
+        raise HTTPException(status_code=500, detail="Internal server error")
