@@ -1,11 +1,15 @@
 import os
 from pathlib import Path
 from fastapi import FastAPI
+from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Literal
 import pandas as pd
 import joblib
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Load environment configuration
